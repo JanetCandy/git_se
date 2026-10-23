@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Docker 微服務展示系統</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, button { padding: 10px; font-size: 16px; margin-right: 10px; }
+        ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Docker 微服務系統儀表板 (Nginx + Python + PostgreSQL)</h1>
+    
+    <div class="card">
+        <h3>新增訊息至 PostgreSQL</h3>
+        <input type="text" id="msgInput" placeholder="輸入訊息...">
+        <button onclick="addMessage()">送出</button>
+    </div>
+
+    <div class="card">
+        <h3>資料庫訊息列表</h3>
+        <ul id="msgList"></ul>
+    </div>
+
+    <script>
+        async function loadMessages() {
+            const res = await fetch('/api/messages');
+            const data = await res.json();
+            const list = document.getElementById('msgList');
+            list.innerHTML = '';
+            data.forEach(m => {
+                const li = document.createElement('li');
+                li.innerText = `${m.content} (時間: ${m.created_at})`;
+                list.appendChild(li);
+            });
+        }
+
+        async function addMessage() {
+            const input = document.getElementById('msgInput');
+            if(!input.value) return;
+            await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: input.value })
+            });
+            input.value = '';
+            loadMessages();
+        }
+
+        loadMessages();
+    </script>
+</body>
+</html>
