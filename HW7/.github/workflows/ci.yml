@@ -1,0 +1,43 @@
+name: HW7 CI - Automated Tests
+
+on:
+  push:
+    branches: [ main, developGitBranch ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 簽出程式碼
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. 設定 Python 環境
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    # 3. 安裝依賴套件
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd python-app
+        pip install -r requirements.txt
+
+    # 4. 安裝 Playwright 瀏覽器核心 (供 E2E 測試使用)
+    - name: Install Playwright Browsers
+      run: |
+        python -m playwright install --with-deps
+
+    # 5. 執行測試 (單元測試 + 系統測試 + E2E 測試)
+    - name: Run Tests with Pytest
+      run: |
+        cd python-app
+        # 啟動背景伺服器 (若需要) 供測試讀取，或直接透過測試客戶端執行
+        pytest -v
+      
