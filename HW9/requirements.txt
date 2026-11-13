@@ -1,1 +1,0 @@
-# Cloudflare Workers Python 環境會自動處理相容的 Python 套件
